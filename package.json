@@ -1,0 +1,9 @@
+{
+  "name": "pgmei",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PGMEI - consulta de débitos MEI",
+  "engines": {
+    "node": ">=18"
+  }
+}

