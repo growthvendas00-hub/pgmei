@@ -1,5 +1,26 @@
 const ENKI_API = 'https://api.enki-bank.com/v1';
 
+// Contador de depósitos — persiste enquanto a instância serverless estiver quente.
+// Ao reiniciar (cold start), retoma a partir de ENKI_DEPOSIT_BASE (padrão 400).
+let _depositCounter = null;
+
+function nextDepositNumber() {
+  if (_depositCounter === null) {
+    _depositCounter = parseInt(process.env.ENKI_DEPOSIT_BASE || '400', 10);
+  }
+  return _depositCounter++;
+}
+
+/**
+ * Remove o prefixo numérico do nome MEI (ex: "00.000.000 NOME EMPRESARIAL EXEMPLO")
+ * e retorna apenas o nome em title case (ex: "Nome Empresarial Exemplo").
+ */
+function limparNomeMEI(nome) {
+  const cleaned = String(nome || '').replace(/^[\d.\\/\-\s]+/, '').trim();
+  if (!cleaned) return String(nome || 'Cliente').trim();
+  return cleaned.toLowerCase().replace(/(?:^|\s)\S/g, c => c.toUpperCase());
+}
+
 function getEnkiConfig() {
   const publicKey = (process.env.ENKI_PUBLIC_KEY || '').trim();
   const secretKey = (process.env.ENKI_SECRET_KEY || '').trim();
@@ -13,7 +34,6 @@ function getEnkiConfig() {
     auth: 'Basic ' + Buffer.from(`${publicKey}:${secretKey}`).toString('base64'),
     maxCentavos: parseInt(process.env.ENKI_MAX_CENTAVOS || '', 10) || 200000,
     postbackUrl: (process.env.ENKI_POSTBACK_URL || '').trim(),
-    productTitle: (process.env.ENKI_PRODUCT_TITLE || 'Regularização MEI').trim(),
     defaultPhone: apenasDigitos(process.env.ENKI_DEFAULT_PHONE) || '11999999999',
   };
 }
@@ -98,6 +118,8 @@ async function enkiFetch(path, options = {}) {
 
 module.exports = {
   getEnkiConfig,
+  nextDepositNumber,
+  limparNomeMEI,
   reaisParaCentavos,
   apenasDigitos,
   emailCliente,

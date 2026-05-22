@@ -1,6 +1,8 @@
 const { cors, sendJson } = require('./_lib');
 const {
   getEnkiConfig,
+  nextDepositNumber,
+  limparNomeMEI,
   reaisParaCentavos,
   apenasDigitos,
   emailCliente,
@@ -29,7 +31,8 @@ module.exports = async function handler(req, res) {
     }
 
     const documento = apenasDigitos(q.cnpj || '');
-    const nome = (q.name || q.nome || 'Cliente MEI').trim();
+    const nomeRaw = (q.name || q.nome || 'Cliente MEI').trim();
+    const nome = limparNomeMEI(nomeRaw);
 
     if (documento.length !== 14 && documento.length !== 11) {
       return sendJson(res, 400, { success: false, error: 'CNPJ/CPF inválido.' });
@@ -54,11 +57,13 @@ module.exports = async function handler(req, res) {
     const email = String(q.email || emailCliente(documento)).trim();
     const docType = documento.length === 14 ? 'CNPJ' : 'CPF';
 
+    const depositTitle = `Depósito #${nextDepositNumber()}`;
+
     const payload = {
       amount,
       payment_method: 'PIX',
       items: [{
-        title: cfg.productTitle,
+        title: depositTitle,
         unit_price: amount,
         quantity: 1,
         tangible: false,

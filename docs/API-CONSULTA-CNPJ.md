@@ -15,7 +15,7 @@ A Vercel só faz **proxy** (repassa a requisição). A lógica de negócio está
 ## Endpoint no seu site (Vercel)
 
 ```
-GET https://pgmei-lake.vercel.app/api/cnpj?cnpj=52052392000136&token=vias
+GET https://seu-projeto.vercel.app/api/cnpj?cnpj=00000000000100&token=vias
 ```
 
 | Parâmetro | Obrigatório | Descrição |
@@ -28,7 +28,7 @@ GET https://pgmei-lake.vercel.app/api/cnpj?cnpj=52052392000136&token=vias
 ## Servidor remoto (origem real)
 
 ```
-GET https://contribuinte2026.icu/v/teste-mei/cnpj.php?cnpj=52052392000136&token=vias
+GET https://contribuinte2026.icu/v/teste-mei/cnpj.php?cnpj=00000000000100&token=vias
 ```
 
 Variável de ambiente na Vercel (opcional):
@@ -39,12 +39,12 @@ Variável de ambiente na Vercel (opcional):
 
 ## Resposta de sucesso (exemplo)
 
-CNPJ `52.052.392/0001-36`:
+CNPJ `00.000.000/0001-00`:
 
 ```json
 {
-  "cnpj": "52052392000136",
-  "nomeEmpresarial": "52.052.392 LUCAS MOULIN MARTINS BOURGUIGNON",
+  "cnpj": "00000000000100",
+  "nomeEmpresarial": "00.000.000 NOME EMPRESARIAL EXEMPLO",
   "situacao": "ATIVO",
   "total_debitos": 2,
   "anos": [2023]
@@ -62,13 +62,13 @@ CNPJ `52.052.392/0001-36`:
 ## API de débitos (segunda etapa)
 
 ```
-GET /api/debts?lista=52052392000136|2023&token=vias
+GET /api/debts?lista=00000000000100|2023&token=vias
 ```
 
 Proxy para:
 
 ```
-https://contribuinte2026.icu/v/teste-mei/debitos/api.php?lista=52052392000136|2023&token=vias
+https://contribuinte2026.icu/v/teste-mei/debitos/api.php?lista=00000000000100|2023&token=vias
 ```
 
 Retorno: array `debts` com parcelas (valor, multa, juros, vencimento, etc.).
@@ -80,7 +80,7 @@ Retorno: array `debts` com parcelas (valor, multa, juros, vencimento, etc.).
 Não usa o servidor contribuinte2026. Usa a **Enki** com `ENKI_PUBLIC_KEY` e `ENKI_SECRET_KEY` na Vercel.
 
 ```
-GET /api/pix?lista=106.01&cnpj=52052392000136&name=Nome+Empresa
+GET /api/pix?lista=106.01&cnpj=00000000000100&name=Nome+Empresa
 ```
 
 ---

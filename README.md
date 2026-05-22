@@ -58,7 +58,6 @@ npx vercel dev
 
 Abra `http://localhost:3000`
 
-## CNPJs de teste
+## Teste local
 
-- `52.052.392/0001-36` — débitos em **2023** (2 parcelas)
-- `46.104.288/0001-45` — débitos em **2022** (9 parcelas)
+Use um CNPJ MEI ativo com débitos cadastrados no servidor remoto para validar o fluxo completo.
